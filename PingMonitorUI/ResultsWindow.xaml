@@ -1,0 +1,12 @@
+﻿<Window x:Class="PingMonitorUI.ResultsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PingMonitorUI"
+        mc:Ignorable="d"
+        Title="Last Results" Height="318.432" Width="492.585" ResizeMode="CanResizeWithGrip">
+    <Grid>
+        <TextBox x:Name="textResults"  HorizontalAlignment="Stretch" Margin="0,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Stretch" Height="Auto" VerticalScrollBarVisibility="Visible" />
+    </Grid>
+</Window>
