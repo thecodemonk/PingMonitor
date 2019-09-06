@@ -98,6 +98,8 @@ namespace PingMonitorUI
         private void _ping_OnPing(object sender, SendPing.OnPingEventArgs e)
         {
             var data = new PingData() { PingSent = e.PingSent, Latency = e.Latency, Success = e.Success };
+            if (chartPingData.ChartValues.Count == 20)
+                chartPingData.ChartValues.RemoveAt(0);
             chartPingData.ChartValues.Add(data);
             var isChecked = chkLogData.Dispatcher.Invoke(() => chkLogData.IsChecked);
             if (isChecked.HasValue && isChecked.Value)
