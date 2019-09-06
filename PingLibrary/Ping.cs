@@ -67,7 +67,7 @@ namespace PingLibrary
                 }
 
                 _data.Add(_ping);
-                PingEvent(_ping.PingSent, _ping.Latency, _ping.Success);
+                PingEvent(_ping.PingSent, _ping.Latency, _ping.Success, _address);
             });
         }
 
@@ -83,7 +83,17 @@ namespace PingLibrary
         {
             StringBuilder sb = new StringBuilder();
             _data.OrderBy(item => item.PingSent).ToList().ForEach(ping => {
-                sb.Append(string.Format("{0} {1} : {2} {3}ms{4}", ping.PingSent.ToShortDateString(), ping.PingSent.ToLongTimeString(), ping.Success, ping.Latency, System.Environment.NewLine));
+                sb.Append($"{ping.PingSent.ToShortDateString()} {ping.PingSent.ToLongTimeString()} : {_address.ToString()} {ping.Success} {ping.Latency}ms{System.Environment.NewLine}");
+            });
+            return sb.ToString();
+        }
+
+        public string GetAllResultsInCsv()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"Date Time, Target, Success, Latency (ms) {System.Environment.NewLine}");
+            _data.OrderBy(item => item.PingSent).ToList().ForEach(ping => {
+                sb.Append($"{ping.PingSent.ToShortDateString()} {ping.PingSent.ToLongTimeString()},{_address.ToString()},{ping.Success},{ping.Latency}{System.Environment.NewLine}");
             });
             return sb.ToString();
         }
@@ -100,17 +110,17 @@ namespace PingLibrary
 
         public long GetMinLatency()
         {
-            return _data.Where(item=> item.Success).Select(item => item.Latency).Min();
+            return _data.Any(item => item.Success) ? _data.Where(item=> item.Success).Select(item => item.Latency).Min() : 0;
         }
 
         public long GetMaxLatency()
         {
-            return _data.Where(item => item.Success).Select(item => item.Latency).Max();
+            return _data.Any(item => item.Success) ? _data.Where(item => item.Success).Select(item => item.Latency).Max(): 0;
         }
 
         public double GetAvgLatency()
         {
-            return _data.Where(item => item.Success).Select(item => item.Latency).Average();
+            return _data.Any(item => item.Success) ? _data.Where(item => item.Success).Select(item => item.Latency).Average() : 0;
         }
 
         public double GetSuccessPercentage()
@@ -118,9 +128,9 @@ namespace PingLibrary
             return ((_data.Where(item => item.Success).Count() / (float)_data.Count()) * 100.0);
         }
 
-        protected virtual void PingEvent(DateTime Sent, long Latency, bool Success)
+        protected virtual void PingEvent(DateTime Sent, long Latency, bool Success, IPAddress target)
         {
-            if (OnPing != null) OnPing(this, new OnPingEventArgs(Sent, Latency, Success));
+            if (OnPing != null) OnPing(this, new OnPingEventArgs(Sent, Latency, Success, target));
         }
 
         #region INotifyPropertyChanged implementation
@@ -137,17 +147,20 @@ namespace PingLibrary
             private readonly DateTime _PingSent;
             private readonly long _Latency;
             private readonly bool _Success;
+            private readonly IPAddress _Target;
 
-            public OnPingEventArgs(DateTime Sent, long Latency, bool Success)
+            public OnPingEventArgs(DateTime Sent, long Latency, bool Success, IPAddress target)
             {
                 _PingSent = Sent;
                 _Latency = Latency;
                 _Success = Success;
+                _Target = target;
             }
 
             public DateTime PingSent { get { return _PingSent; } }
             public long Latency { get { return _Latency; } }
             public bool Success { get { return _Success; } }
+            public IPAddress Target { get { return _Target; } }
         }
     }
 }

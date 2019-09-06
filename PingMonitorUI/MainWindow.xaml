@@ -38,5 +38,6 @@
         <Label x:Name="lblMax" Content="0" HorizontalAlignment="Left" Margin="129,19,0,0" VerticalAlignment="Top" Width="37" FontWeight="Bold" Grid.Row="1"  />
         <Label Content="Avg:" HorizontalAlignment="Left" Margin="166,19,0,0" VerticalAlignment="Top" Width="37" Grid.Row="1"  />
         <Label x:Name="lblAvg" Content="0" HorizontalAlignment="Left" Margin="198,19,0,0" VerticalAlignment="Top" Width="99" FontWeight="Bold" Grid.Row="1"  />
+        <CheckBox x:Name="chkLogData" Content="Log Data" HorizontalAlignment="Left" Margin="196,38,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

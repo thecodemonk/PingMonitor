@@ -1,4 +1,5 @@
 ﻿using PingLibrary;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,6 @@ namespace PingMonitorUI
                 _running = false;
                 _ping.OnPing -= _ping_OnPing;
                 btnStartStop.Content = "Start";
-                //textResult.Text = _ping.GetSummaryResults();
             }
             else
             {
@@ -97,15 +97,29 @@ namespace PingMonitorUI
 
         private void _ping_OnPing(object sender, SendPing.OnPingEventArgs e)
         {
-            chartPingData.ChartValues.Add(new PingData() { PingSent = e.PingSent, Latency = e.Latency, Success = e.Success });
+            var data = new PingData() { PingSent = e.PingSent, Latency = e.Latency, Success = e.Success };
+            chartPingData.ChartValues.Add(data);
+            var isChecked = chkLogData.Dispatcher.Invoke(() => chkLogData.IsChecked);
+            if (isChecked.HasValue && isChecked.Value)
+            {
+                LogData(data, e.Target);
+            }
             UpdateStats();
+        }
+
+        private void LogData(PingData data, IPAddress target)
+        {
+            if (!data.Success)
+                Serilog.Log.Error($"{data.PingSent.ToShortDateString()} {data.PingSent.ToLongTimeString()}, { target.ToString() }, Failed, 0");
+            else
+                Serilog.Log.Information($"{data.PingSent.ToShortDateString()} {data.PingSent.ToLongTimeString()}, {target.ToString()}, Success, {data.Latency}");
         }
 
         private void btnGetAllResults_Click(object sender, RoutedEventArgs e)
         {
             if (_ping != null)
             {
-                var data = _ping.GetAllResults();
+                var data = _ping.GetAllResultsInCsv();
                 ResultsWindow winRes = new ResultsWindow(data);
                 winRes.ShowDialog();
             }
